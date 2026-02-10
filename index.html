@@ -74,17 +74,21 @@
   message.style.transition = "opacity 0.3s";
   document.body.appendChild(message);
 
-  // Initial position
-// Start the "No" button to the right of "Yes"
-const buttons = document.querySelector(".buttons");
-const yesBtn = document.getElementById("yes");
+    function positionButtons() {
+      const yesRect = yesBtn.getBoundingClientRect();
+      const containerRect = buttons.getBoundingClientRect();
 
-const yesRect = yesBtn.getBoundingClientRect();
-const buttonsRect = buttons.getBoundingClientRect();
+      // Center YES
+      const yesLeft =
+        containerRect.width / 2 - yesRect.width;
 
-noBtn.style.left = `${yesRect.width - 60}px`;
-noBtn.style.top = `0px`;
-noBtn.style.transform = "none";
+      yesBtn.style.position = "absolute";
+      yesBtn.style.left = `${yesLeft}px`;
+      yesBtn.style.top = `0px`;
+
+      // NO is one button-width away from YES
+      noBtn.style.left = `${yesLeft + yesRect.width * 2}px`;
+      noBtn.style.top = `0px`;
 
 // Function to dodge
 function dodge(x, y) {
