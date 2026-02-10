@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Be My Valentine 💘</title>
-
+  <title>Be My Valentine 💖</title>
   <style>
     body {
       height: 100vh;
@@ -13,16 +11,20 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
     }
 
-    .container {
-      text-align: center;
-      width: 100%;
-      max-width: 420px;
-      padding: 20px;
-      position: relative;
-    }
+   .container {
+  text-align: center;
+  position: relative;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  position: relative;
+}
 
     h1 {
       font-size: 2.2rem;
@@ -30,128 +32,143 @@
       margin-bottom: 40px;
     }
 
-    .buttons {
-      position: relative;
-      height: 140px;
-    }
-
     button {
       font-size: 1.4rem;
-      padding: 16px 30px;
+      padding: 15px 30px;
       border: none;
-      border-radius: 16px;
+      border-radius: 12px;
       cursor: pointer;
-      touch-action: none;
+      transition: transform 0.1s ease;
     }
 
     #yes {
       background-color: #ff4d88;
       color: white;
-      position: relative;
-      z-index: 1;
+      margin-right: 20px;
     }
 
-    #no {
-      background-color: #999;
-      color: white;
-      position: absolute;
-      left: 60%;
-      top: 0;
-    }
-
-    .nice-try {
-      position: absolute;
-      font-size: 1.2rem;
-      color: #b30059;
-      opacity: 0;
-      transition: opacity 0.25s;
-      pointer-events: none;
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 2rem;
-      }
-
-      button {
-        font-size: 1.3rem;
-        padding: 18px 32px;
-      }
-    }
+   #no {
+  position: absolute;
+}
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Will you be my Valentine? 💘</h1>
-
-    <div class="buttons">
-      <button id="yes">Yes 💖</button>
-      <button id="no">No 💔</button>
-      <div id="msg" class="nice-try">Nice try 😏</div>
-    </div>
+    <h1>Ahoj Klara, will you be my Valentine? 💘</h1>
+      <div class="buttons">
+        <button id="yes">Yes 💖</button>
+        <button id="no">No 💔</button>
+      </div>
   </div>
 
-  <script>
-    const noBtn = document.getElementById("no");
-    const yesBtn = document.getElementById("yes");
-    const msg = document.getElementById("msg");
+<script>
+  const noBtn = document.getElementById("no");
 
-    function dodge(x, y) {
-      const rect = noBtn.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
+  // Create the "Nice try" message
+  const message = document.createElement("div");
+  message.innerText = "Nice try 😏";
+  message.style.position = "absolute";
+  message.style.fontSize = "1.2rem";
+  message.style.color = "#b30059";
+  message.style.opacity = "0";
+  message.style.transition = "opacity 0.3s";
+  document.body.appendChild(message);
 
-      const dx = centerX - x;
-      const dy = centerY - y;
-      const distance = Math.hypot(dx, dy);
+  // Initial position
+// Start the "No" button to the right of "Yes"
+const buttons = document.querySelector(".buttons");
+const yesBtn = document.getElementById("yes");
 
-      const dangerZone = 120;
+const yesRect = yesBtn.getBoundingClientRect();
+const buttonsRect = buttons.getBoundingClientRect();
 
-      if (distance < dangerZone) {
-        const jump = window.innerWidth < 600 ? 100 : 140;
+noBtn.style.left = `${yesRect.width - 60}px`;
+noBtn.style.top = `0px`;
+noBtn.style.transform = "none";
 
-        let newLeft = rect.left + Math.sign(dx || 1) * jump;
-        let newTop = rect.top + Math.sign(dy || 1) * jump;
+// Function to dodge
+function dodge(x, y) {
+  const rect = noBtn.getBoundingClientRect();
+  const btnCenterX = rect.left + rect.width / 2;
+  const btnCenterY = rect.top + rect.height / 2;
 
-        // keep inside screen
-        newLeft = Math.max(10, Math.min(window.innerWidth - rect.width - 10, newLeft));
-        newTop = Math.max(10, Math.min(window.innerHeight - rect.height - 10, newTop));
+  const dx = x - btnCenterX;
+  const dy = y - btnCenterY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  const dangerZone = 120;
 
-        noBtn.style.left = `${newLeft}px`;
-        noBtn.style.top = `${newTop}px`;
+  if (distance < dangerZone) {
+    const jump = 120; // max jump in px
 
-        msg.style.left = `${newLeft}px`;
-        msg.style.top = `${newTop - 40}px`;
-        msg.style.opacity = "1";
+    // Random new position around current
+    let newLeft = rect.left + (Math.random() > 0.5 ? jump : -jump);
+    let newTop = rect.top + (Math.random() > 0.5 ? jump : -jump);
 
-        clearTimeout(msg.timer);
-        msg.timer = setTimeout(() => {
-          msg.style.opacity = "0";
-        }, 700);
-      }
-    }
+    // Keep inside viewport (works for mobile)
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
-    // Desktop
-    document.addEventListener("mousemove", e => {
-      dodge(e.clientX, e.clientY);
-    });
+    newLeft = Math.max(10, Math.min(viewportWidth - rect.width - 10, newLeft));
+    newTop = Math.max(10, Math.min(viewportHeight - rect.height - 10, newTop));
 
-    // Mobile
-    document.addEventListener("touchstart", e => {
-      const t = e.touches[0];
-      if (t) dodge(t.clientX, t.clientY);
-    });
+    // Apply new position
+    noBtn.style.left = `${newLeft}px`;
+    noBtn.style.top = `${newTop}px`;
 
-    document.addEventListener("touchmove", e => {
-      const t = e.touches[0];
-      if (t) dodge(t.clientX, t.clientY);
-    });
+    // Show message above button
+    message.style.left = `${newLeft}px`;
+    message.style.top = `${newTop - 40}px`;
+    message.style.opacity = "1";
 
-    // YES button works
-    yesBtn.addEventListener("click", () => {
-      document.body.innerHTML = `
-        <div style="
-          height:100vh;
-          display:flex;
-          align-items:center;
-          justify-content
+    clearTimeout(message.hideTimer);
+    message.hideTimer = setTimeout(() => {
+      message.style.opacity = "0";
+    }, 700);
+  }
+}
+
+  document.getElementById("yes").addEventListener("click", () => {
+  document.body.innerHTML = `
+    <div style="
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:'Comic Sans MS', cursive;
+      background:linear-gradient(135deg, #ff9a9e, #fad0c4);
+      color:#b30059;
+      font-size:2.8rem;
+      text-align:center;
+      padding:20px;
+    ">
+      💖 Great choice! 💖<br><br>
+      Das mi svoje cislo? :)
+    </div>
+  `;
+});
+
+
+  // Desktop
+document.addEventListener("mousemove", e => dodge(e.clientX, e.clientY));
+
+// Mobile touch
+document.addEventListener("touchmove", e => {
+  const touch = e.touches[0];
+  if (touch) {
+    dodge(touch.clientX, touch.clientY);
+  }
+});
+
+// Set initial position on page load (both desktop & mobile)
+function initNoBtnPosition() {
+  noBtn.style.position = "absolute";
+  noBtn.style.left = "200px"; // distance from Yes button
+  noBtn.style.top = "0px";
+  noBtn.style.transform = "none";
+}
+
+window.addEventListener("load", initNoBtnPosition);
+window.addEventListener("resize", initNoBtnPosition);
+</script>
+</body>
+</html>
