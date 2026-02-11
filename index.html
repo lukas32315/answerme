@@ -1,79 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Be My Valentine 💘</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Be My Valentine 💘</title>
 
-  <style>
-    body {
-      height: 100vh;
-      margin: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+<style>
+  body {
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
 
-    .container {
-      text-align: center;
-      width: 100%;
-      max-width: 420px;
-      padding: 20px;
-    }
+  .container {
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+  }
 
-    h1 {
-      font-size: 2.2rem;
-      color: #b30059;
-      margin-bottom: 40px;
-    }
+  h1 {
+    font-size: 2.2rem;
+    color: #b30059;
+    margin-bottom: 60px;
+  }
 
-    .buttons {
-      position: relative;
-      height: 160px;
-    }
+  .buttons {
+    position: relative;
+    height: 250px;
+  }
 
-    button {
-      font-size: 1.4rem;
-      padding: 16px 30px;
-      border: none;
-      border-radius: 16px;
-      cursor: pointer;
-      touch-action: none;
-      position: absolute;
-    }
+  button {
+    font-size: 1.4rem;
+    padding: 16px 30px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    position: absolute;
+    transition: all 0.25s ease;
+  }
 
-    #yes {
-      background-color: #ff4d88;
-      color: white;
-      z-index: 2;
-    }
+  #yes {
+    background-color: #ff4d88;
+    color: white;
+  }
 
-    #no {
-      background-color: #999;
-      color: white;
-      z-index: 1;
-    }
+  #no {
+    background-color: #777;
+    color: white;
+  }
 
-    .nice-try {
-      position: absolute;
-      font-size: 1.2rem;
-      color: #b30059;
-      opacity: 0;
-      transition: opacity 0.25s;
-      pointer-events: none;
-    }
-
-    @media (max-width: 480px) {
-      h1 { font-size: 2rem; }
-      button {
-        font-size: 1.3rem;
-        padding: 18px 32px;
-      }
-    }
-  </style>
+  .nice-try {
+    position: absolute;
+    font-size: 1.2rem;
+    color: #b30059;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+</style>
 </head>
 <body>
 
@@ -88,67 +78,68 @@
 </div>
 
 <script>
-const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
+const noBtn = document.getElementById("no");
 const msg = document.getElementById("msg");
 
-// Center buttons with 1-button-width gap
+let yesScale = 1;
+let noScale = 1;
+
+// Initial centered positioning
 function positionButtons() {
-  const yesRect = yesBtn.getBoundingClientRect();
-  const screenWidth = window.innerWidth;
+  const container = document.querySelector(".buttons");
+  const rect = container.getBoundingClientRect();
 
-  const yesLeft = (screenWidth / 2) - yesRect.width;
-  yesBtn.style.left = `${yesLeft}px`;
-  yesBtn.style.top = `55%`;
+  const centerX = rect.width / 2;
 
-  noBtn.style.left = `${yesLeft + yesRect.width * 2}px`;
-  noBtn.style.top = `55%`;
+  yesBtn.style.left = (centerX - yesBtn.offsetWidth - 20) + "px";
+  yesBtn.style.top = "100px";
+
+  noBtn.style.left = (centerX + 20) + "px";
+  noBtn.style.top = "100px";
 }
 
 window.addEventListener("load", positionButtons);
 window.addEventListener("resize", positionButtons);
 
-function dodge(x, y) {
-  const rect = noBtn.getBoundingClientRect();
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
+// Move NO button randomly inside screen
+function moveNoButton() {
+  const maxX = window.innerWidth - noBtn.offsetWidth;
+  const maxY = window.innerHeight - noBtn.offsetHeight;
 
-  const dx = centerX - x;
-  const dy = centerY - y;
-  const distance = Math.hypot(dx, dy);
-  const dangerZone = 120;
+  const randomX = Math.random() * maxX;
+  const randomY = Math.random() * maxY;
 
-  if (distance < dangerZone) {
-    const jump = window.innerWidth < 600 ? 90 : 130;
+  noBtn.style.left = randomX + "px";
+  noBtn.style.top = randomY + "px";
 
-    let newLeft = rect.left + Math.sign(dx || 1) * jump;
-    let newTop = rect.top + Math.sign(dy || 1) * jump;
+  // Show "Nice try"
+  msg.style.left = randomX + "px";
+  msg.style.top = (randomY - 30) + "px";
+  msg.style.opacity = "1";
 
-    // Keep strictly inside screen
-    newLeft = Math.max(0, Math.min(window.innerWidth - rect.width, newLeft));
-    newTop = Math.max(0, Math.min(window.innerHeight - rect.height, newTop));
+  clearTimeout(msg.timer);
+  msg.timer = setTimeout(() => {
+    msg.style.opacity = "0";
+  }, 600);
 
-    noBtn.style.left = `${newLeft}px`;
-    noBtn.style.top = `${newTop}px`;
+  // Grow YES
+  yesScale += 0.1;
+  yesBtn.style.transform = `scale(${yesScale})`;
 
-    msg.style.left = `${newLeft}px`;
-    msg.style.top = `${newTop - 35}px`;
-    msg.style.opacity = "1";
-
-    clearTimeout(msg.timer);
-    msg.timer = setTimeout(() => {
-      msg.style.opacity = "0";
-    }, 600);
-  }
+  // Shrink NO (limit minimum size)
+  noScale -= 0.05;
+  if (noScale < 0.4) noScale = 0.4;
+  noBtn.style.transform = `scale(${noScale})`;
 }
 
-// Desktop
-document.addEventListener("mousemove", e => dodge(e.clientX, e.clientY));
+// Desktop hover
+noBtn.addEventListener("mouseenter", moveNoButton);
 
-// Mobile
-document.addEventListener("touchmove", e => {
-  const t = e.touches[0];
-  if (t) dodge(t.clientX, t.clientY);
+// Mobile touch
+noBtn.addEventListener("touchstart", function(e) {
+  e.preventDefault();
+  moveNoButton();
 });
 
 // YES click
